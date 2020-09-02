@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http;
+using System.Text.Encodings;
+using System.Text;
 
 namespace DateToDays
 {
@@ -51,7 +53,7 @@ namespace DateToDays
             //Return it
             log.LogInformation("Returning package");
             HttpResponseMessage msg = new HttpResponseMessage();
-            msg.Content = new StringContent(as_json);
+            msg.Content = new StringContent(as_json, Encoding.UTF8, "application/json");
             msg.StatusCode = HttpStatusCode.OK;
             return msg;
         }
@@ -100,7 +102,7 @@ namespace DateToDays
             //Return it
             log.LogInformation("Returning");
             HttpResponseMessage msg = new HttpResponseMessage();
-            msg.Content = new StringContent(as_json);
+            msg.Content = new StringContent(as_json, Encoding.UTF8, "application/json");
             msg.StatusCode = HttpStatusCode.OK;
             return msg;
         }
