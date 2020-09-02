@@ -56,9 +56,63 @@ namespace DateToDays
             return msg;
         }
 
+        [FunctionName("IsAfterNow")]
+        public static HttpResponseMessage IsAfterNow([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req, ILogger log)
+        {
+            string datestr = req.Query["date"];
+
+            //Parse it
+            log.LogInformation("Parsing provided date.");
+            DateTime dt;
+            try
+            {
+                dt = DateTime.Parse(datestr);
+                log.LogInformation("Date received and successfully parsed: " + datestr);
+            }
+            catch
+            {
+                log.LogError("Unable to parse date: " + datestr);
+                HttpResponseMessage emsg = new HttpResponseMessage();
+                emsg.StatusCode = HttpStatusCode.BadRequest;
+                emsg.Content = new StringContent("Unable to parse date '" + datestr + "'.");
+                return emsg;
+            }
+
+            //Evaluate
+            log.LogInformation("Evaluating...");
+            bool toreturn = false;
+            if (dt > DateTime.Now)
+            {
+                toreturn = true;
+            }
+            else
+            {
+                toreturn = false;
+            }
+
+
+            //Encode
+            log.LogInformation("Encoding package");
+            ConditionalReturn cr = new ConditionalReturn();
+            cr.Value = toreturn;
+            string as_json = JsonConvert.SerializeObject(cr);
+
+            //Return it
+            log.LogInformation("Returning");
+            HttpResponseMessage msg = new HttpResponseMessage();
+            msg.Content = new StringContent(as_json);
+            msg.StatusCode = HttpStatusCode.OK;
+            return msg;
+        }
+
         public class DaysReturn
         {
             public int NumberOfDays {get; set;}
+        }
+
+        public class ConditionalReturn
+        {
+            public bool Value {get; set;}
         }
 
     }
